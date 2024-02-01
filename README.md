@@ -1,13 +1,8 @@
 # Shopify Developer Challenge
 
-Hello there potential Shopify Expert!
+Welcome, potential Shopify Expert!
 
-We would like to assess your Shopify Accumen so we have developed this pretty awesome test that will stretch your imagination, but not take you too much time. The challenge is to create a simple Product Detail Page (PDP) using Shopify Liquid Syntax, and the AJAX cart api all contained within this simple repository.
-
-To make the challenge as accessible as possible, we have created a standalone node app that will serve up the finished product and handle all of the routes that you will need to complete the project.
-
-*Sound FUN?!?* - then read on.
-
+This challenge aims to gauge your Shopify skills through the creation of a simple Product Detail Page (PDP) using Shopify Liquid Syntax and the AJAX cart API, all contained within this repository.
 ## Setup
 
 As mentioned, the challenge is self contained within this repository so there will be no need to create a dev store or anything like that. Instead we created a little module that will show rendered liquid code, serve static assets, and handle the cart POST request for you. And while it helps if you have an understanding of node-js, it should be simple enough to run without any help.
@@ -39,7 +34,6 @@ So here is what we are looking for.
 * Using some front end javascript, attach a handler to the add to cart button that posts the appropriate information the `cart/add.js` route. That route will simply return the data `{ success: 1 }` so display a success message to let the user know their product was added correctly!
 * Make sure the add to cart request sends the appropriate data to the endpoint to add an item to the cart (Using the shopify API paradigm).
 
-And *Voila!* You are almost done!
 
 ## Troubleshooting tips
 
@@ -52,5 +46,3 @@ To stop the development server, simlpy do a `ctrl` + `c` and the node process wi
 When you are done - remove _ALL_ of the text from this README, and replace it with a description of what you did. Tell us why you made the choices you did, what you would have liked to do better, what was your favorite part, and most importantly, what would you change if this we're _ACTUALLY_ a shopify theme.
 
 Once you have that done - Commit a new branch - and send us a link to your repo so that we can review what you did.
-
-Don't forget - *HAVE FUN!*
