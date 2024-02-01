@@ -1,5 +1,102 @@
+<style>
+    .product__old-price {
+        text-decoration: line-through;
+    }
+
+    .product__variant-selectors {
+        display: flex;
+        gap: 10px;
+    }
+
+    .variant-selector {
+        padding: 8px 12px;
+        background-color: #ADD8E6;
+        color: #000;
+        border: 1px solid #0000FF;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .variant-selector:hover {
+        background-color: #0000FF;
+        color: #fff
+    }
+
+    .product__add-to-cart {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        text-decoration: none;
+        background-color: #0000FF;
+        color: #fff;
+        border: 1px solid #0000FF;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      .product__add-to-cart:hover {
+        background-color: #000080;
+        color: #fff;
+      }
+</style>
+
 {% layout "template.liquid" %}
 
+
 {% block content %}
-    <h1>{{ product.title | capitalize }}</h1>
+    {% assign selected_variant = product.selected_or_first_available_variant %}
+
+    <div class="product__image">
+        {% if product.images.size > 0 %}
+            <img src="{{ product.featured_image | image_url: 'large' }}" alt="{{ product.title }}" width="500px" height="auto">
+        {% endif %}
+    </div>
+    <div class="product__image-gallery">
+        {% for image in product.images %}
+            <img src="{{ image | image_url: 'small' }}" alt="{{ product.title }}" width="100px" height="auto">
+        {% endfor %}
+    </div>
+
+    <h1 class="product__title">{{ product.title | capitalize }}</h1>
+
+    <div class="product__price-container">
+        <span class="product__old-price">{{ product.compare_at_price | money_with_currency }}</span>
+        <span class="product__price">{{ product.price | money_with_currency }}</span>
+    </div>
+
+    <div class="product__variant-selectors">
+        {% for variant in product.variants %}
+            <button class="variant-selector" data-variant-id="{{ variant.id }}">
+                {{ variant.title }}
+            </button>
+        {% endfor %}
+    </div>
+
+    <div class="product__buy-buttons">
+        <button
+            id="ProductSubmitButton"
+            type="submit"
+            name="add"
+            class="product__add-to-cart"
+            {% if product.selected_or_first_available_variant.available == false or quantity_rule_soldout %}
+              disabled
+            {% endif %}
+          >
+            <span>
+              {%- if product.selected_or_first_available_variant.available == false or quantity_rule_soldout -%}
+                Sold Out
+              {%- else -%}
+                Add to cart
+              {%- endif -%}
+            </span>
+          </button>
+    </div>
+
+    <div class="product__description">
+        {{ product.description }}
+    </div>
 {% endblock %}
+
