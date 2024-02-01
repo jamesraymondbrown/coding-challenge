@@ -1,4 +1,52 @@
 <style>
+    {% comment %} General styles {% endcomment %}
+    :root {
+        --main-color: #3498db;
+        --accent-color: #e74c3c;
+        --font-small: 16px;
+        --font-medium: 24px;
+        --font-large: 32px;
+      }
+
+    p {
+        font-size: var(--font-small);
+    }
+
+    .d-none {
+        display: none;
+    }
+
+    .product__container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    {% comment %} Image styles {% endcomment %}
+
+    .product__image {
+        width: 100%;
+    }
+
+    .product__image-gallery {
+        display: flex;
+    }
+
+    .product__thumbnail {
+        flex: 1;
+    }
+
+    {% comment %} Content styles {% endcomment %}
+
+    .product__content {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .product__title {
+        font-size: var(--font-large);
+    }
+
     .product__old-price {
         text-decoration: line-through;
     }
@@ -6,10 +54,13 @@
     .product__variant-selectors {
         display: flex;
         gap: 10px;
+        flex-wrap: wrap;
     }
 
     .variant-selector {
         padding: 8px 12px;
+        min-width: 50px;
+        font-size: var(--font-medium);
         background-color: #ADD8E6;
         color: #000;
         border: 1px solid #0000FF;
@@ -25,7 +76,7 @@
     .product__add-to-cart {
         display: inline-block;
         padding: 10px 20px;
-        font-size: 16px;
+        font-size: var(--font-medium);
         font-weight: bold;
         text-align: center;
         text-decoration: none;
@@ -41,7 +92,61 @@
         background-color: #000080;
         color: #fff;
       }
+
+    {% comment %} Desktop styles {% endcomment %}
+
+    @media only screen and (min-width: 768px) {
+        .product__container {
+            flex-direction: row;
+            gap: 20px;
+        }
+      }
 </style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const form = document.getElementById("addToCartForm");
+
+        form.addEventListener("submit", function(event) {
+            event.preventDefault();
+            console.log('Product added to cart');
+
+            const variantId = addToCartForm.querySelector("[data-atc-variant-id]").value;
+
+            // Create the data payload for the POST request
+            let data = {
+                'items': [{
+                 'id': variantId,
+                 'quantity': 2
+                 }]
+               };
+
+            console.log('data', data)
+
+            fetch("/cart/add.js", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Success:", data);
+                const atcButton = document.getElementById("AddToCart")
+
+                // Add a p element with the success message after the atcButton
+                const addedMessage = document.createElement("p");
+                addedMessage.textContent = "Product added to cart";
+                addedMessage.classList.add("product__added-message");
+                atcButton.parentNode.insertBefore(addedMessage, atcButton.nextSibling);
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+        });
+    });
+</script>
 
 {% layout "template.liquid" %}
 
@@ -49,54 +154,71 @@
 {% block content %}
     {% assign selected_variant = product.selected_or_first_available_variant %}
 
-    <div class="product__image">
-        {% if product.images.size > 0 %}
-            <img src="{{ product.featured_image | image_url: 'large' }}" alt="{{ product.title }}" width="500px" height="auto">
-        {% endif %}
-    </div>
-    <div class="product__image-gallery">
-        {% for image in product.images %}
-            <img src="{{ image | image_url: 'small' }}" alt="{{ product.title }}" width="100px" height="auto">
-        {% endfor %}
-    </div>
-
-    <h1 class="product__title">{{ product.title | capitalize }}</h1>
-
-    <div class="product__price-container">
-        <span class="product__old-price">{{ product.compare_at_price | money_with_currency }}</span>
-        <span class="product__price">{{ product.price | money_with_currency }}</span>
-    </div>
-
-    <div class="product__variant-selectors">
-        {% for variant in product.variants %}
-            <button class="variant-selector" data-variant-id="{{ variant.id }}">
-                {{ variant.title }}
-            </button>
-        {% endfor %}
-    </div>
-
-    <div class="product__buy-buttons">
-        <button
-            id="ProductSubmitButton"
-            type="submit"
-            name="add"
-            class="product__add-to-cart"
-            {% if product.selected_or_first_available_variant.available == false or quantity_rule_soldout %}
-              disabled
+    <div class="product__container">
+        <div class="product__image--container">
+            {% if product.images.size > 0 %}
+                <img class="product__image" src="{{ product.featured_image | image_url: 'large' }}" alt="{{ product.title }}" width="400px" height="auto">
             {% endif %}
-          >
-            <span>
-              {%- if product.selected_or_first_available_variant.available == false or quantity_rule_soldout -%}
-                Sold Out
-              {%- else -%}
-                Add to cart
-              {%- endif -%}
-            </span>
-          </button>
-    </div>
+            <div class="product__image-gallery">
+                {% for image in product.images %}
+                    <img class="product__thumbnail" src="{{ image | image_url: 'small' }}" alt="{{ product.title }}" width="80px" height="auto">
+                {% endfor %}
+            </div>
+        </div>
 
-    <div class="product__description">
-        {{ product.description }}
+        <div class="product__content">
+            <h1 class="product__title">{{ product.title | capitalize }}</h1>
+
+            <div class="product__price-container">
+                <span class="product__old-price">{{ product.compare_at_price | money_with_currency }}</span>
+                <span class="product__price">{{ product.price | money_with_currency }}</span>
+            </div>
+
+            <div class="product__variant-selectors">
+                {% for variant in product.variants %}
+                    <button class="variant-selector" data-variant-id="{{ variant.id }}">
+                        {{ variant.title }}
+                    </button>
+                {% endfor %}
+            </div>
+
+            <p>{{ product.id }}</p>
+
+            <div class="product__buy-buttons">
+                {% comment %} Liquid's {% form 'product' %} throws an error here, so using an html form instead {% endcomment %}
+                <form id="addToCartForm" method="post" action="/cart/add.js">
+                    <input
+                        class="d-none"
+                        aria-hidden="true"
+                        name="id"
+                        value="{{ product.id }}"
+                        data-atc-variant-id
+                    >
+
+                    <button
+                        id="AddToCart"
+                        type="submit"
+                        name="add"
+                        class="product__add-to-cart"
+                        {% if product.selected_or_first_available_variant.available == false or quantity_rule_soldout %}
+                          disabled
+                        {% endif %}
+                      >
+                        <span>
+                          {%- if product.selected_or_first_available_variant.available == false or quantity_rule_soldout -%}
+                            Sold Out
+                          {%- else -%}
+                            Add to cart
+                          {%- endif -%}
+                        </span>
+                    </button>
+                </form>
+            </div>
+
+            <div class="product__description">
+                {{ product.description }}
+            </div>
+        </div>
+
     </div>
 {% endblock %}
-
