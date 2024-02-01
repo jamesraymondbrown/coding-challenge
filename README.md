@@ -1,4 +1,4 @@
-# First + Third Shopify Developer Challenge
+# Shopify Developer Challenge
 
 Hello there potential Shopify Expert!
 
