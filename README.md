@@ -32,7 +32,7 @@ On the very-off chance that something goes horribly wrong and my code doesn't re
 - Added JS logic to handle currency formatting. Usually I’d rely on the “money_with_currency” liquid filter to do this, but that didn’t work because this isn’t connected to an actual store. 
 - Added variant selectors that are functional and update the variant ID that’s sent in the add to cart request.
 - Added a quantity selector which is similarly functional and updates quantity value for the add to cart request.
-- Added POST request to the AJAX api, following the cart request format outlined in [this Shopify doc](https://shopify.dev/docs/api/ajax/reference/cart)
+- Added POST request to the AJAX api, following the cart request format outlined in [this Shopify doc](https://shopify.dev/docs/api/ajax/reference/cart).
 - Added success and error messages that appear after clicking “Add to cart”. Success appears whenever our POST request receives a success message back from the fake cart API. Error message appears whenever a customer tries to add products to the cart without first selecting a variant.
 - Added loading spinner to mimic actual API call, and show the user that their add to cart request is being processed.
 - Pulled the product’s description to display below the add to cart form — On a real store I probably would have included an option to hide the description under a dropdown. But since the product was so basic and there’s no theme settings to interact with, I left the description fully displayed. 
@@ -59,7 +59,7 @@ I liked working from scratch and just building. It was fun to be given a totally
 
 - I'd have had more robust error handling for the cart API. There wasn't much to work around though since our API only returns "Success: true".
 
-- Simirly, I'd have added more checks in the liquid code to see if certain theme settings are selected before rendering elements. EX: `{% if section.settngs.display_description == true %} {{ product.description }} {% endif %}`
+- Similarly, I'd have added more checks in the liquid code to see if certain theme settings are selected before rendering elements. EX: `{% if section.settngs.display_description == true %} {{ product.description }} {% endif %}`
 
 - I’d have connected product images to the selected variant, so that the displayed product image changes as you select new variants, if those variants have a different featured image. But since our test product has the same images for all variants, that seemed like overkill here.
 
@@ -67,6 +67,6 @@ I liked working from scratch and just building. It was fun to be given a totally
 
 - The “money_with_currency” liquid filter also wasn't working, so I added JS to format prices with currency. But I’d just use that liquid filter on an actual Shopify store. There are other examples of things I'd have done with liquid tools as well, but I think two is enough for here. This README is already pretty long.
 
-- I’d have made the code more modular. A lot of what’s in the product.liquid file could be used in other places. EX: if we made a quick-view modal, we’d want to use the product image/gallery, variant selectors, etc. So likely I’d movee those into their own separate snippets and call those snippets as needed. 
+- I’d have made the code more modular. A lot of what’s in the product.liquid file could be used in other places. EX: if we made a quick-view modal, we’d want to use the product image/gallery, variant selectors, etc. So likely I’d move those into their own separate snippets and call those snippets as needed. 
 
 - I’d have linked most text to the en.default.json file, instead of hardcoding it (things like “Add to cart”, “Sale”, etc), to ensure that the site is easy to translate.
