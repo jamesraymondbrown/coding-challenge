@@ -8,7 +8,7 @@ On the very-off chance that something goes horribly wrong and my code doesn't re
 ## To preview my PDP
 
 - Git clone this repository onto your local machine
-- navigate into the folder that you just cloned
+- Navigate into the folder that you just cloned
 - Change to my branch with `git checkout feature/pdp`
 - Run `npm install`
 - Run `npm run dev`
