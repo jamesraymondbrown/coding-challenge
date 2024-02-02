@@ -120,6 +120,8 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+        const addedMessage = document.getElementById("AddedMessage")
+        const errorMessage = document.getElementById("ErrorMessage");
 
         // Update selected variant when variant buttons are clicked
         let selectedVariantId = null;
@@ -137,13 +139,17 @@
 
         // ATC Form Submit
         const form = document.getElementById("addToCartForm");
-
         form.addEventListener("submit", function(event) {
             event.preventDefault();
-            console.log('Product added to cart');
             const selectedQuantity = form.querySelector("#quantity").value;
 
-            // Create the data payload for the POST request
+            if (selectedVariantId === null) {
+                console.log("no selected variant")
+                addedMessage.classList.add("d-none")
+                errorMessage.classList.remove("d-none")
+                return
+            }
+
             let data = {
                 'items': [{
                  'id': selectedVariantId,
@@ -163,13 +169,8 @@
             .then(response => response.json())
             .then(data => {
                 console.log("Success:", data);
-                const atcButton = document.getElementById("AddToCart")
-
-                // Add a p element with the success message after the atcButton
-                const addedMessage = document.createElement("p");
-                addedMessage.textContent = "Product added to cart";
-                addedMessage.classList.add("product__added-message");
-                atcButton.parentNode.insertBefore(addedMessage, atcButton.nextSibling);
+                errorMessage.classList.add("d-none")
+                addedMessage.classList.remove("d-none")
             })
             .catch(error => {
                 console.error("Error:", error);
@@ -240,6 +241,9 @@
                     </span>
                 </button>
             </form>
+
+            <p id="AddedMessage" class="d-none">Product added to the cart</p>
+            <p id="ErrorMessage" class="d-none">Please select a variant!</p>
 
             <div class="product__description">
                 {{ product.description }}
