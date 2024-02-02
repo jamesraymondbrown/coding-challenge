@@ -73,6 +73,7 @@
     }
 
     .product__title {
+        margin-bottom: 0;
         font-size: var(--font-large);
     }
 
@@ -137,12 +138,24 @@
         border-radius: var(--border-radius);
         cursor: pointer;
         transition: background-color 0.3s ease;
-      }
+    }
 
-      .product__add-to-cart:hover {
-        background-color: #000080;
+    .product__add-to-cart:hover {
+      background-color: #000080;
+      color: #fff;
+    }
+
+    .sale-badge {
+        margin-top: 10px;
+        padding: 8px 16px;
+        width: 50px;
+        border-radius: 20px;
+        background-color: #3498db;
         color: #fff;
-      }
+        text-align: center;
+        text-decoration: none;
+        font-weight: bold;
+    }
 
     {% comment %} Desktop styles {% endcomment %}
 
@@ -266,6 +279,9 @@
             <div class="product__price-container">
                 <span class="product__old-price money">{{ product.compare_at_price | money_with_currency }}</span>
                 <span class="product__price money">{{ product.price | money_with_currency }}</span>
+                {% if product.price < product.compare_at_price> %}
+                    <div class="sale-badge">Sale</div>
+                {% endif %}
             </div>
 
             <div class="product__variant-selectors">
