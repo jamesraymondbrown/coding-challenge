@@ -1,13 +1,8 @@
 <link rel="stylesheet"
     href="https://fonts.googleapis.com/css?family=Montserrat">
-<style>
-body {
-  font-family: 'Montserrat', serif;
-}
-</style>
 
 <style>
-    {% comment %} General styles {% endcomment %}
+    /* General styles */
     :root {
         --font-small: 18px;
         --font-medium: 24px;
@@ -18,6 +13,7 @@ body {
 
     body {
         background: aliceblue;
+        font-family: 'Montserrat', serif;
     }
 
     p {
@@ -28,12 +24,6 @@ body {
         display: none;
     }
 
-    .product__atc-message {
-        position: absolute;
-        font-size: var(--font-small);
-        top: 110px;
-    }
-
     .error {
         color: red;
     }
@@ -42,15 +32,17 @@ body {
         color: green;
     }
 
+    /* Product template container */
+
     .product__container {
         display: flex;
         margin: auto;
-        padding: 20px;
+        padding: 10px;
         max-width: var(--site-max-width);
         flex-direction: column;
     }
 
-    {% comment %} Image styles {% endcomment %}
+    /* Image styles */
 
     .product__image--wrapper {
         position: relative;
@@ -62,6 +54,7 @@ body {
         background: white;
         cursor: zoom-in;
         border-radius: var(--border-radius);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
 
     .product__image-gallery {
@@ -78,12 +71,69 @@ body {
     }
 
     .product__thumbnail.selected {
-        outline: 1px solid black;
+        outline: 1px solid #e2e2e2;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
 
-    {% comment %} Content styles {% endcomment %}
+    /* Zoom image on container hover */
 
-    .product__content--container {
+    .product__image--zoom-container {
+        display: none;
+        position: absolute;
+        overflow: hidden;
+        width: 300px;
+        height: 200px;
+        border-radius: var(--border-radius);
+        z-index: 100;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .product__image--zoomed-preview {
+        position: absolute;
+        border: 1px solid #ddd;
+        background-color: #f1f1f1;
+        background-size: 300% 300%;
+        width: 100%;
+        height: 100%;
+        border-radius: var(--border-radius);
+        transition: background-position 0.5s ease;
+    }
+
+    /* Image Modal */
+
+    .product__image--modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgb(0, 0, 0);
+        background-color: rgba(0, 0, 0, 0.9);
+    }
+
+    .product__image--modal-content {
+        margin: 65px auto 0;
+        display: block;
+        max-width: 80%;
+        max-height: 80%;
+    }
+
+    .close {
+        position: absolute;
+        top: 15px;
+        right: 35px;
+        color: #f1f1f1;
+        font-size: 40px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    /* Content styles */
+
+    .product__content-container {
         display: flex;
         flex-direction: column;
         gap: 20px;
@@ -166,6 +216,12 @@ body {
       color: #fff;
     }
 
+    .product__atc-message {
+        position: absolute;
+        font-size: var(--font-small);
+        top: 110px;
+    }
+
     .sale-badge {
         margin-top: 10px;
         padding: 8px 16px;
@@ -178,60 +234,23 @@ body {
         font-weight: bold;
     }
 
-    {% comment %} Image Modal {% endcomment %}
+    /* Loading Spinner */
 
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 1;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgb(0, 0, 0);
-        background-color: rgba(0, 0, 0, 0.9);
+    .loading-spinner {
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
     }
 
-    .modal-content {
-        margin: 65px auto 0;
-        display: block;
-        max-width: 80%;
-        max-height: 80%;
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
     }
 
-    .close {
-        position: absolute;
-        top: 15px;
-        right: 35px;
-        color: #f1f1f1;
-        font-size: 40px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-    {% comment %} Zoom image on container hover {% endcomment %}
-
-    .zoom-container {
-        display: none;
-        position: absolute;
-        overflow: hidden;
-        width: 300px;
-        height: 200px;
-        z-index: 100;
-    }
-
-    .zoomed-preview {
-        position: absolute;
-        border: 1px solid #ddd;
-        background-color: #f1f1f1;
-        background-size: 300% 300%;
-        width: 100%;
-        height: 100%;
-        transition: background-position 0.5s ease;
-    }
-
-    {% comment %} Breakpoint styles {% endcomment %}
+    /* Medium breakpoint */
 
     @media only screen and (min-width: 500px) {
         .product__atc-message {
@@ -245,42 +264,30 @@ body {
         .product__add-to-cart {
             width: auto;
         }
-      }
+    }
+
+    /* Large breakpoint */
 
     @media only screen and (min-width: 768px) {
         .product__container {
+            padding: 20px;
             flex-direction: row;
             gap: 20px;
         }
 
-        .product__image--container {
+        .product__image-container {
             width: 45%;
         }
 
-        .product__content--container {
+        .product__content-container {
             width: 55%;
         }
-    }
-
-    {% comment %} Loading Spinner {% endcomment %}
-
-    .loading-spinner {
-        border: 4px solid rgba(0, 0, 0, 0.1);
-        border-top: 4px solid #3498db; /* Change color as needed */
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
     }
 </style>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+
         // Update product image each time a thumbnail is clicked
         const productImage = document.querySelector('.product__image');
         const thumbnailImages = document.querySelectorAll('.product__thumbnail');
@@ -337,14 +344,13 @@ body {
                     return
                 }
 
+                // AJAX api POST request to cart route
                 let data = {
                     'items': [{
                      'id': selectedVariantId,
                      'quantity': parseInt(selectedQuantity, 10)
                      }]
                    };
-
-                console.log("Product added to cart:", data)
 
                 fetch("/cart/add.js", {
                     method: "POST",
@@ -356,6 +362,7 @@ body {
                 .then(response => response.json())
                 .then(response => {
                     if (response.success === true) {
+                        console.log("Product added to cart:", data)
                         errorMessage.classList.add("d-none")
                         loadingSpinner.classList.add('d-none')
                         addedMessage.classList.remove("d-none")
@@ -369,7 +376,7 @@ body {
             }, 500);
         });
 
-        // Format prices like a currency. Adding this because the "money_with_currency" liquid filter isn't working
+        // Format prices in dollars. Adding this because the "money_with_currency" liquid filter isn't working
         const moneyElements = document.querySelectorAll('.money');
         moneyElements.forEach((element) => {
             const originalCents = parseFloat(element.textContent);
@@ -393,8 +400,8 @@ body {
         window.closeModal = closeModal;
 
         // Zoom into image on hover
-        const zoomContainer = document.querySelector('.zoom-container');
-        const zoomedPreview = document.querySelector('.zoomed-preview');
+        const zoomContainer = document.querySelector('.product__image--zoom-container');
+        const zoomedPreview = document.querySelector('.product__image--zoomed-preview');
 
         productImage.addEventListener('mousemove', function (event) {
             zoomedPreview.style.backgroundImage = `url('${productImage.src}')`;
@@ -427,17 +434,15 @@ body {
     });
 </script>
 
-{% layout "template.liquid" %}
-
 {% block content %}
-    <div class="product__container container">
-        <div class="product__image--container">
+    <div class="product__container">
+        <div class="product__image-container">
             {% if product.images.size > 0 %}
                 <div class="product__image--wrapper">
-                    <img class="product__image" src="{{ product.featured_image | image_url: 'large' }}" alt="{{ product.title }}" width="800px" height="auto">
+                    <img class="product__image" src="{{ product.featured_image | image_url: 'large' }}" alt="{{ product.title }}" width="px" height="auto">
 
-                    <div class="zoom-container">
-                        <div class="zoomed-preview"></div>
+                    <div class="product__image--zoom-container">
+                        <div class="product__image--zoomed-preview"></div>
                     </div>
                 </div>
             {% endif %}
@@ -450,7 +455,7 @@ body {
             {% endif %}
         </div>
 
-        <div class="product__content--container">
+        <div class="product__content-container">
             <h1 class="product__title">{{ product.title | capitalize }}</h1>
 
             <div class="product__price-container">
@@ -486,19 +491,19 @@ body {
                     type="submit"
                     name="add"
                     class="product__add-to-cart"
-                    {% if product.selected_or_first_available_variant.available == false or quantity_rule_soldout %}
+                    {% if product.selected_or_first_available_variant.available == false %}
                       disabled
                     {% endif %}
                   >
                     <span>
-                      {%- if product.selected_or_first_available_variant.available == false or quantity_rule_soldout -%}
+                      {%- if product.selected_or_first_available_variant.available == false -%}
                         Sold Out
                       {%- else -%}
                         Add to cart
                       {%- endif -%}
                     </span>
                 </button>
-                <p id="AddedMessage" class="d-none product__atc-message success">Product added to the cart</p>
+                <p id="AddedMessage" class="d-none product__atc-message success">Product added to cart.</p>
                 <p id="ErrorMessage" class="d-none product__atc-message error">Please select a size!</p>
                 <div class="loading-spinner d-none" id="loadingSpinner"></div>
             </form>
@@ -510,9 +515,9 @@ body {
             {% endif %}
         </div>
 
-        <div id="productImageModal" class="modal">
+        <div id="productImageModal" class="product__image--modal">
             <span class="close" onclick="closeModal()">&times;</span>
-            <img class="modal-content" id="modalImage">
+            <img class="product__image--modal-content" id="modalImage" width="1000px" height="auto">
         </div>
 
     </div>
