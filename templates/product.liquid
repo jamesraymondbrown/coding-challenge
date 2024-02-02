@@ -1,12 +1,16 @@
 <style>
     {% comment %} General styles {% endcomment %}
     :root {
-        --main-color: #3498db;
-        --accent-color: #e74c3c;
-        --font-small: 16px;
+        --font-small: 18px;
         --font-medium: 24px;
         --font-large: 32px;
-      }
+        --border-radius: 5px;
+        --site-max-width: 1200px;
+    }
+
+    body {
+        background: aliceblue;
+    }
 
     p {
         font-size: var(--font-small);
@@ -16,23 +20,48 @@
         display: none;
     }
 
+    .atc__message {
+        position: absolute;
+        font-size: var(--font-small);
+        top: 45px;
+    }
+
+    .error {
+        color: red;
+    }
+
+    .success {
+        color: green;
+    }
+
     .product__container {
         display: flex;
+        margin: auto;
+        padding: 20px;
+        max-width: var(--site-max-width);
         flex-direction: column;
     }
 
     {% comment %} Image styles {% endcomment %}
 
     .product__image {
+        margin: 20px 0 10px;
         width: 100%;
+        background: white;
     }
 
     .product__image-gallery {
         display: flex;
+        gap: 10px;
     }
 
     .product__thumbnail {
         flex: 1;
+        background: white;
+    }
+
+    .product__thumbnail.selected {
+        outline: 1px solid black;
     }
 
     {% comment %} Content styles {% endcomment %}
@@ -51,6 +80,11 @@
         text-decoration: line-through;
     }
 
+    .product__price,
+    .product__old-price {
+        font-size: var(--font-medium);
+    }
+
     .product__variant-selectors {
         display: flex;
         gap: 10px;
@@ -60,9 +94,10 @@
     .product__variant-selector {
         padding: 8px 12px;
         min-width: 50px;
-        font-size: var(--font-medium);
-        background-color: #ADD8E6;
-        color: #000;
+        font-size: var(--font-small);
+        border-radius: var(--border-radius);
+        background-color: white;
+        color: black;
         border: 1px solid #0000FF;
         cursor: pointer;
         transition: all 0.3s ease;
@@ -71,11 +106,12 @@
     .product__variant-selector.selected,
     .product__variant-selector:hover {
         background-color: #0000FF;
-        color: #fff
+        color: white;
     }
 
     .product__atc-form {
         display: flex;
+        position: relative;
         gap: 20px;
         align-items: center;
         font-size: var(--font-medium);
@@ -83,7 +119,7 @@
 
     select {
         height: 40px;
-        border-radius: 5px;
+        border-radius: var(--border-radius);
         padding: 5px;
         font-size: 16px;
     }
@@ -98,7 +134,7 @@
         background-color: #0000FF;
         color: #fff;
         border: 1px solid #0000FF;
-        border-radius: 5px;
+        border-radius: var(--border-radius);
         cursor: pointer;
         transition: background-color 0.3s ease;
       }
@@ -120,10 +156,25 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        const addedMessage = document.getElementById("AddedMessage")
-        const errorMessage = document.getElementById("ErrorMessage");
+        // Update product image each time a thumbnail is clicked
+        const productImage = document.querySelector('.product__image');
+        const thumbnailImages = document.querySelectorAll('.product__thumbnail');
 
-        // Update selected variant when variant buttons are clicked
+        thumbnailImages.forEach((thumbnail) => {
+            thumbnail.addEventListener('click', function() {
+                updateProductImage(thumbnail.src);
+                thumbnailImages.forEach((img) => {
+                    img.classList.remove('selected');
+                });
+                thumbnail.classList.add('selected');
+            });
+        });
+
+        function updateProductImage(src) {
+            productImage.src = src;
+        }
+
+        // Update selected variant variable when variant buttons are clicked
         let selectedVariantId = null;
         const variantButtons = document.querySelectorAll('.product__variant-selector')
 
@@ -139,12 +190,14 @@
 
         // ATC Form Submit
         const form = document.getElementById("addToCartForm");
+        const addedMessage = document.getElementById("AddedMessage")
+        const errorMessage = document.getElementById("ErrorMessage");
+
         form.addEventListener("submit", function(event) {
             event.preventDefault();
             const selectedQuantity = form.querySelector("#quantity").value;
 
             if (selectedVariantId === null) {
-                console.log("no selected variant")
                 addedMessage.classList.add("d-none")
                 errorMessage.classList.remove("d-none")
                 return
@@ -157,7 +210,7 @@
                  }]
                };
 
-            console.log('data', data)
+            console.log("Product added to cart:", data)
 
             fetch("/cart/add.js", {
                 method: "POST",
@@ -167,40 +220,52 @@
                 body: JSON.stringify(data),
             })
             .then(response => response.json())
-            .then(data => {
-                console.log("Success:", data);
-                errorMessage.classList.add("d-none")
-                addedMessage.classList.remove("d-none")
+            .then(response => {
+                if (response.success === true) {
+                    errorMessage.classList.add("d-none")
+                    addedMessage.classList.remove("d-none")
+                } else {
+                    console.log("Product add to cart failed.")
+                }
             })
             .catch(error => {
                 console.error("Error:", error);
             });
+        });
+
+        // Format prices like a currency. Adding this because the "money_with_currency" liquid filter isn't working
+        const moneyElements = document.querySelectorAll('.money');
+        moneyElements.forEach((element) => {
+            const originalCents = parseFloat(element.textContent);
+            const dollars = (originalCents / 100).toFixed(2);
+            element.textContent = `$${dollars}`;
         });
     });
 </script>
 
 {% layout "template.liquid" %}
 
-
 {% block content %}
-    <div class="product__container">
+    <div class="product__container container">
         <div class="product__image--container">
             {% if product.images.size > 0 %}
                 <img class="product__image" src="{{ product.featured_image | image_url: 'large' }}" alt="{{ product.title }}" width="400px" height="auto">
             {% endif %}
-            <div class="product__image-gallery">
-                {% for image in product.images %}
-                    <img class="product__thumbnail" src="{{ image | image_url: 'small' }}" alt="{{ product.title }}" width="80px" height="auto">
-                {% endfor %}
-            </div>
+            {% if product.images.size > 1 %}
+                <div class="product__image-gallery">
+                    {% for image in product.images %}
+                        <img class="product__thumbnail{% if forloop.index == 1 %} selected{% endif %}" src="{{ image | image_url: 'small' }}" alt="{{ product.title }}" width="10%" height="auto">
+                    {% endfor %}
+                </div>
+            {% endif %}
         </div>
 
         <div class="product__content">
             <h1 class="product__title">{{ product.title | capitalize }}</h1>
 
             <div class="product__price-container">
-                <span class="product__old-price">{{ product.compare_at_price | money_with_currency }}</span>
-                <span class="product__price">{{ product.price | money_with_currency }}</span>
+                <span class="product__old-price money">{{ product.compare_at_price | money_with_currency }}</span>
+                <span class="product__price money">{{ product.price | money_with_currency }}</span>
             </div>
 
             <div class="product__variant-selectors">
@@ -211,7 +276,7 @@
                 {% endfor %}
             </div>
 
-            {% comment %} Liquid's {% form 'product' %} throws an error here, so using an html form instead {% endcomment %}
+            {% comment %} Adding liquid's {% form %} here throws an error, so using an html form instead {% endcomment %}
             <form id="addToCartForm" class="product__atc-form" method="post" action="/cart/add.js">
                 <span class="product__quantity-selector">
                     <label for="quantity">Quantity:</label>
@@ -240,14 +305,15 @@
                       {%- endif -%}
                     </span>
                 </button>
+                <p id="AddedMessage" class="d-none atc__message success">Product added to the cart</p>
+                <p id="ErrorMessage" class="d-none atc__message error">Please select a variant!</p>
             </form>
 
-            <p id="AddedMessage" class="d-none">Product added to the cart</p>
-            <p id="ErrorMessage" class="d-none">Please select a variant!</p>
-
-            <div class="product__description">
-                {{ product.description }}
-            </div>
+            {% if product.description != blank %}
+                <div class="product__description">
+                    {{ product.description }}
+                </div>
+            {% endif %}
         </div>
 
     </div>
