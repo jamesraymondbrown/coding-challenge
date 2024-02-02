@@ -179,6 +179,13 @@
         color: white;
     }
 
+    .product__variant-selector.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background-color: #ddd;
+        color: #666;
+    }
+
     .product__atc-form {
         display: flex;
         flex-direction: column;
@@ -468,7 +475,8 @@
 
             <div class="product__variant-selectors">
                 {% for variant in product.variants %}
-                    <button class="product__variant-selector" data-variant-id="{{ variant.id }}">
+                    <button class="product__variant-selector{% if variant.available != true %} disabled{% endif %}" data-variant-id="{{ variant.id }}"{% if variant.available != true %} disabled{% endif %}>
+                        {{  }}
                         {{ variant.title }}
                     </button>
                 {% endfor %}
