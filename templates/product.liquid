@@ -57,7 +57,7 @@
         flex-wrap: wrap;
     }
 
-    .variant-selector {
+    .product__variant-selector {
         padding: 8px 12px;
         min-width: 50px;
         font-size: var(--font-medium);
@@ -68,9 +68,24 @@
         transition: all 0.3s ease;
     }
 
-    .variant-selector:hover {
+    .product__variant-selector.selected,
+    .product__variant-selector:hover {
         background-color: #0000FF;
         color: #fff
+    }
+
+    .product__atc-form {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        font-size: var(--font-medium);
+    }
+
+    select {
+        height: 40px;
+        border-radius: 5px;
+        padding: 5px;
+        font-size: 16px;
     }
 
     .product__add-to-cart {
@@ -105,19 +120,34 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+
+        // Update selected variant when variant buttons are clicked
+        let selectedVariantId = null;
+        const variantButtons = document.querySelectorAll('.product__variant-selector')
+
+        variantButtons.forEach((button) => {
+            button.addEventListener('click', function() {
+                variantButtons.forEach((btn) => {
+                    btn.classList.remove('selected');
+                });
+                button.classList.add('selected');
+                selectedVariantId = button.getAttribute('data-variant-id');
+            });
+        });
+
+        // ATC Form Submit
         const form = document.getElementById("addToCartForm");
 
         form.addEventListener("submit", function(event) {
             event.preventDefault();
             console.log('Product added to cart');
-
-            const variantId = addToCartForm.querySelector("[data-atc-variant-id]").value;
+            const selectedQuantity = form.querySelector("#quantity").value;
 
             // Create the data payload for the POST request
             let data = {
                 'items': [{
-                 'id': variantId,
-                 'quantity': 2
+                 'id': selectedVariantId,
+                 'quantity': parseInt(selectedQuantity, 10)
                  }]
                };
 
@@ -152,8 +182,6 @@
 
 
 {% block content %}
-    {% assign selected_variant = product.selected_or_first_available_variant %}
-
     <div class="product__container">
         <div class="product__image--container">
             {% if product.images.size > 0 %}
@@ -176,44 +204,42 @@
 
             <div class="product__variant-selectors">
                 {% for variant in product.variants %}
-                    <button class="variant-selector" data-variant-id="{{ variant.id }}">
+                    <button class="product__variant-selector" data-variant-id="{{ variant.id }}">
                         {{ variant.title }}
                     </button>
                 {% endfor %}
             </div>
 
-            <p>{{ product.id }}</p>
+            {% comment %} Liquid's {% form 'product' %} throws an error here, so using an html form instead {% endcomment %}
+            <form id="addToCartForm" class="product__atc-form" method="post" action="/cart/add.js">
+                <span class="product__quantity-selector">
+                    <label for="quantity">Quantity:</label>
+                    <select name="quantity" id="quantity">
+                      {% assign maxQuantity = 10 %}
+                      {% for i in (1..maxQuantity) %}
+                        <option value="{{ i }}">{{ i }}</option>
+                      {% endfor %}
+                    </select>
+                </span>
 
-            <div class="product__buy-buttons">
-                {% comment %} Liquid's {% form 'product' %} throws an error here, so using an html form instead {% endcomment %}
-                <form id="addToCartForm" method="post" action="/cart/add.js">
-                    <input
-                        class="d-none"
-                        aria-hidden="true"
-                        name="id"
-                        value="{{ product.id }}"
-                        data-atc-variant-id
-                    >
-
-                    <button
-                        id="AddToCart"
-                        type="submit"
-                        name="add"
-                        class="product__add-to-cart"
-                        {% if product.selected_or_first_available_variant.available == false or quantity_rule_soldout %}
-                          disabled
-                        {% endif %}
-                      >
-                        <span>
-                          {%- if product.selected_or_first_available_variant.available == false or quantity_rule_soldout -%}
-                            Sold Out
-                          {%- else -%}
-                            Add to cart
-                          {%- endif -%}
-                        </span>
-                    </button>
-                </form>
-            </div>
+                <button
+                    id="AddToCart"
+                    type="submit"
+                    name="add"
+                    class="product__add-to-cart"
+                    {% if product.selected_or_first_available_variant.available == false or quantity_rule_soldout %}
+                      disabled
+                    {% endif %}
+                  >
+                    <span>
+                      {%- if product.selected_or_first_available_variant.available == false or quantity_rule_soldout -%}
+                        Sold Out
+                      {%- else -%}
+                        Add to cart
+                      {%- endif -%}
+                    </span>
+                </button>
+            </form>
 
             <div class="product__description">
                 {{ product.description }}
