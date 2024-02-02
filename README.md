@@ -2,7 +2,7 @@
 
 I had a great time working on this challenge! 
 
-On the very-off change that something goes horribly wrong and my code doesn't render properly on your computer, I've made a quick demo video showing how things look on my end. It's likely not necessary, but I figure you can never bee too cautious. You can see that here:
+On the very-off chance that something goes horribly wrong and my code doesn't render properly on your computer, I've made a quick demo video showing how things look on my end. It's likely not necessary, but I figure you can never bee too cautious. You can see that here:
 [PREVIEW VIDEO](https://share.zight.com/L1uyOekj)
 
 ## To preview my PDP
