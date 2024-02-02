@@ -5,6 +5,15 @@ I had a great time working on this challenge!
 On the very-off change that something goes horribly wrong and my code doesn't render properly on your computer, I've made a quick demo video showing how things look on my end. It's likely not necessary, but I figure you can never bee too cautious. You can see that here:
 [PREVIEW VIDEO](https://share.zight.com/L1uyOekj)
 
+## To preview my PDP
+
+- Git clone this repository onto your local machine
+- navigate into the folder that you just cloned
+- Change to my branch with `git checkout feature/pdp`
+- Run `npm install`
+- Run `npm run dev`
+- Navigate to http://0.0.0.0:3000 in your browser to preview the PDP
+
 ## CHANGES I MADE
 
 ### IMAGES
