@@ -261,6 +261,22 @@ body {
             width: 55%;
         }
     }
+
+    {% comment %} Loading Spinner {% endcomment %}
+
+    .loading-spinner {
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        border-top: 4px solid #3498db; /* Change color as needed */
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
 </style>
 
 <script>
@@ -301,45 +317,56 @@ body {
         const form = document.getElementById("addToCartForm");
         const addedMessage = document.getElementById("AddedMessage")
         const errorMessage = document.getElementById("ErrorMessage");
+        const loadingSpinner = document.getElementById('loadingSpinner');
+
 
         form.addEventListener("submit", function(event) {
             event.preventDefault();
+            loadingSpinner.classList.remove('d-none')
+            addedMessage.classList.add("d-none")
+            errorMessage.classList.add("d-none")
             const selectedQuantity = form.querySelector("#quantity").value;
 
-            if (selectedVariantId === null) {
-                addedMessage.classList.add("d-none")
-                errorMessage.classList.remove("d-none")
-                return
-            }
+            // Added setTimeout to mimic external api call and display loading spinner
+            setTimeout(() => {
 
-            let data = {
-                'items': [{
-                 'id': selectedVariantId,
-                 'quantity': parseInt(selectedQuantity, 10)
-                 }]
-               };
-
-            console.log("Product added to cart:", data)
-
-            fetch("/cart/add.js", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data),
-            })
-            .then(response => response.json())
-            .then(response => {
-                if (response.success === true) {
-                    errorMessage.classList.add("d-none")
-                    addedMessage.classList.remove("d-none")
-                } else {
-                    console.log("Product add to cart failed.")
+                if (selectedVariantId === null) {
+                    addedMessage.classList.add("d-none")
+                    loadingSpinner.classList.add('d-none')
+                    errorMessage.classList.remove("d-none")
+                    return
                 }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-            });
+
+                let data = {
+                    'items': [{
+                     'id': selectedVariantId,
+                     'quantity': parseInt(selectedQuantity, 10)
+                     }]
+                   };
+
+                console.log("Product added to cart:", data)
+
+                fetch("/cart/add.js", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(data),
+                })
+                .then(response => response.json())
+                .then(response => {
+                    if (response.success === true) {
+                        errorMessage.classList.add("d-none")
+                        loadingSpinner.classList.add('d-none')
+                        addedMessage.classList.remove("d-none")
+                    } else {
+                        console.log("Product add to cart failed.")
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                });
+            }, 500);
         });
 
         // Format prices like a currency. Adding this because the "money_with_currency" liquid filter isn't working
@@ -473,6 +500,7 @@ body {
                 </button>
                 <p id="AddedMessage" class="d-none product__atc-message success">Product added to the cart</p>
                 <p id="ErrorMessage" class="d-none product__atc-message error">Please select a size!</p>
+                <div class="loading-spinner d-none" id="loadingSpinner"></div>
             </form>
 
             {% if product.description != blank %}
